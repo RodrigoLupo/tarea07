@@ -173,103 +173,40 @@ exports.submitRecipeOnPost = async(req, res) => {
 
 
 
+exports.deleteRecipe = async (req, res) => {
+  try {
+      const { id } = req.params;
+      await Recipe.findByIdAndDelete(id);
+      req.flash('success', 'Recipe deleted successfully');
+      res.redirect('/');
+  } catch (error) {
+      console.error(error);
+      req.flash('error', 'Error deleting recipe');
+      res.redirect('/');
+  }
+}
+exports.editRecipe = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const updatedData = {
+          email: req.body.email,
+          name: req.body.name,
+          description: req.body.description,
+          ingredients: req.body.ingredients, // Debes asegurarte que esté en el formato correcto
+          category: req.body.category
+      };
 
-// Delete Recipe
-// async function deleteRecipe(){
-//   try {
-//     await Recipe.deleteOne({ name: 'New Recipe From Form' });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-// deleteRecipe();
+      // Si se sube una nueva imagen, reemplaza la existente
+      if (req.file) {
+          updatedData.image = req.file.filename;
+      }
 
-
-// Update Recipe
-// async function updateRecipe(){
-//   try {
-//     const res = await Recipe.updateOne({ name: 'New Recipe' }, { name: 'New Recipe Updated' });
-//     res.n; // Number of documents matched
-//     res.nModified; // Number of documents modified
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-// updateRecipe();
-
-
-/**
- * Dummy Data Example 
-*/
-
-// async function insertDymmyCategoryData(){
-//   try {
-//     await Category.insertMany([
-//       {
-//         "name": "Thai",
-//         "image": "thai-food.jpg"
-//       },
-//       {
-//         "name": "American",
-//         "image": "american-food.jpg"
-//       }, 
-//       {
-//         "name": "Chinese",
-//         "image": "chinese-food.jpg"
-//       },
-//       {
-//         "name": "Mexican",
-//         "image": "mexican-food.jpg"
-//       }, 
-//       {
-//         "name": "Indian",
-//         "image": "indian-food.jpg"
-//       },
-//       {
-//         "name": "Spanish",
-//         "image": "spanish-food.jpg"
-//       }
-//     ]);
-//   } catch (error) {
-//     console.log('err', + error)
-//   }
-// }
-
-// insertDymmyCategoryData();
-
-
-// async function insertDymmyRecipeData(){
-//   try {
-//     await Recipe.insertMany([
-//       { 
-//         "name": "Recipe Name Goes Here",
-//         "description": `Recipe Description Goes Here`,
-//         "email": "recipeemail@raddy.co.uk",
-//         "ingredients": [
-//           "1 level teaspoon baking powder",
-//           "1 level teaspoon cayenne pepper",
-//           "1 level teaspoon hot smoked paprika",
-//         ],
-//         "category": "American", 
-//         "image": "southern-friend-chicken.jpg"
-//       },
-//       { 
-//         "name": "Recipe Name Goes Here",
-//         "description": `Recipe Description Goes Here`,
-//         "email": "recipeemail@raddy.co.uk",
-//         "ingredients": [
-//           "1 level teaspoon baking powder",
-//           "1 level teaspoon cayenne pepper",
-//           "1 level teaspoon hot smoked paprika",
-//         ],
-//         "category": "American", 
-//         "image": "southern-friend-chicken.jpg"
-//       },
-//     ]);
-//   } catch (error) {
-//     console.log('err', + error)
-//   }
-// }
-
-// insertDymmyRecipeData();
-
+      await Recipe.findByIdAndUpdate(id, updatedData);
+      req.flash('success', 'Recipe updated successfully');
+      res.redirect(`/recipe/${id}`);
+  } catch (error) {
+      console.error(error);
+      req.flash('error', 'Error updating recipe');
+      res.redirect(`/edit-recipe/${id}`);
+  }
+}
